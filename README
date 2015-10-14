@@ -1,0 +1,44 @@
+
+
+A titre d'exemples, quelques cibles du fichier build.xml sont pré-remplies. Concentrez vous sur les "Not implemented !!"
+
+Question 1: 
+
+les dépendances entre les cibles:
+
+distb dépend de clean
+init dépend de clean
+compile dépend de init
+compile-test dépend de compile
+run dépend de compile
+run-test dépend de compile-test
+report-test dépend de run-test
+jar dépend de compile, run, test, javadoc
+
+Les cibles modifiant l'arboresence des fichiers:
+
+La cible clean supprime les dossiers suivants:
+src
+test-classes
+test-reports
+jar
+api
+tmp
+
+La cible init créée les dossiers suivants
+bin
+test-classes
+report/data/
+api
+jar
+
+La cible dist créée les dossiers suivants:
+dist
+tmp
+
+Trace de l'éxécution de la commande ant jar:
+La cible clean supprime les dossirs générés ainsi que les backup,
+La cible init a pour tache de créer des nouveaux dossiers
+La cible compile se charge de compiler les fichiers java présents dans le répertoire src
+Compile-test et run-test ne sont pas implémentés, ils n'affichent que ce message.
+La cible javadoc génère la documentation des classes java présentes dans le répertoire src
