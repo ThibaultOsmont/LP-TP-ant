@@ -1,0 +1,350 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="Operations" default="displayProperties" basedir=".">
+
+	<!-- =================================================================== -->
+	<!-- Définition des propriétés du projet -->
+	<!-- =================================================================== -->
+
+	<!-- Définition des propriétés communes à tous les projets du développeur -->
+	<!-- <property file="${user.home}/.ant/ant-global.properties" /> -->
+	
+	<!-- Définition des propriétés propres à ce projet -->
+	<property file="${basedir}/project.properties" />
+	<!-- Project specific properties -->
+	<property name="project.shortname" 		value="Hello"/>
+	<property name="package.name" 			value="hello"/>
+	<property name="mainclass" 			value="hello.Hello"/>
+	<property name="project.version" value="0.0.1" />
+	<property name="project.author" value="Moi" />
+	<property name="project.license" location="LICENSE" />
+
+	<!-- répertoire du code source du projet -->
+	<property name="src.dir" value="src" />
+	<!-- répertoire du code source des tests -->
+	<property name="test.dir" value="test" />
+ 	<!-- répertoire des bibliothèques requises pour la compilation, l'exécution du code source et des tests du projet --> 
+	<property name="lib.dir" value="lib" />
+	<!-- répertoire de construction -->
+	<property name="classes.dir" value="bin" />
+	<property name="jar.dir" value="jar" />
+	<property name="javadoc.dir" value="api" />
+	<property name="dist.dir" value="dist" />
+	<property name="tmp.dir" value="tmp" />
+
+	<property name="test.classes.dir" value="test-classes" />
+	<property name="reports.dir" value="test-reports" />
+	<property name="reports.data.dir" value="${reports.dir}/data" />
+	<property name="reports.html.dir" value="${reports.dir}/html" />
+
+	<property name="changelog.file" value="Changelog.txt" />
+
+	<property name="debug.flag" value="on"/>
+	<property name="verbose.flag" value="no"/>
+
+
+	<!-- =================================================================== -->
+	<!-- Definition des  différents listfile, patternset et path -->
+	<!-- =================================================================== -->
+
+	<path id="compile.path">
+		<fileset dir="${lib.dir}">
+			<include name="**/*.jar"/>
+		</fileset>
+		<pathelement path="${classpath}"/>
+	</path>
+	
+	<path id="test.compile.path">
+		<path refid="compile.path"/>
+		<pathelement location="${classes.dir}"/>
+		<pathelement location="${test.classes.dir}"/>
+		<fileset dir="${lib.dir}">
+			<include name="**/*.jar"/>
+		</fileset>
+		<pathelement path="${classpath}"/>
+	</path>
+
+	<path id="run.path">
+		<path refid="compile.path"/>
+		<pathelement location="${classes.dir}"/>
+	</path>
+	
+	<path id="test.run.path">
+		<path refid="test.compile.path"/>
+		<pathelement location="${classes.dir}"/>
+		<pathelement location="${test.classes.dir}"/>
+	</path>
+
+	<!-- path pour test compile et run non implémenté -->
+
+	
+	<!-- =================================================================== -->
+	<!-- Default -->
+	<!-- =================================================================== -->
+
+	<target name="displayProperties" description="Par défaut, affichage des propriétés du projet">
+		<tstamp />
+
+		<echo message="${TODAY}," />
+		<echo message="Project ${ant.project.name}" />
+		<echo message="Version ${project.version}" />
+		<echo message="Author ${project.author}" />
+		<echo message="Ant Configuration File ${ant.file}" />
+		<echo message="JVM  ${ant.java.version}" />
+		<echoproperties/>
+
+	</target>
+
+
+	<!-- =================================================================== -->
+    	<!-- clean generated files and backup files -->
+	<!-- =================================================================== -->
+
+	<target name="clean" description="Suppression des répertoires et fichiers générés">
+
+		<tstamp />
+
+		<delete dir="${classes.dir}" />
+		<delete dir="${test.classes.dir}" />
+		<delete dir="${reports.dir}" />
+		<delete dir="${javadoc.dir}" />
+		<delete dir="${jar.dir}" />
+		<!--<delete dir="${dist.dir}" /> -->
+		<delete dir="${tmp.dir}" /> 
+
+		<patternset id="module.patterns">
+          <include name="**/*~"/>
+          <include name="**/*.bak"/>
+        </patternset>
+        <delete>
+        	<fileset id="modules" dir="." >
+        	<patternset refid="module.patterns"/>
+        	</fileset>
+        </delete>
+	
+		<echo message="${DSTAMP}-${TSTAMP} -- Suppression des répértoires et fichiers générés" />
+		<echo file="${changelog.file}" message="${DSTAMP}-${TSTAMP} -- Suppression des répértoires et fichiers générés${line.separator}" />
+
+	</target>
+
+	<!-- =================================================================== -->
+	<!-- Initialisation -->
+	<!-- =================================================================== -->
+
+	<target name="init" depends="clean" description="Création des répertoires de construction du projet">
+
+		<tstamp />
+
+		<mkdir dir="${classes.dir}" />
+		<mkdir dir="${test.classes.dir}" />
+		<mkdir dir="${reports.data.dir}" />
+		<mkdir dir="${javadoc.dir}" />
+		<mkdir dir="${jar.dir}" />
+
+		<!-- cree ces fichiers si ne sont pas crees -->
+		<touch file="README" />
+		<touch file="LICENSE" />
+
+		<echo message="${DSTAMP}-${TSTAMP} -- Création des répertoires de construction du projet" />
+		<echo file="${changelog.file}" message="${DSTAMP}-${TSTAMP} -- Création des répertoires de construction du projet${line.separator}" />
+
+	</target>
+
+
+	<!-- ================================================-->
+	<!-- Compilation des sources          -->
+	<!-- ================================================-->
+
+	<target name="compile" depends="init" description="Compilation des sources métiers du projet">
+	  <javac srcdir="${src.dir}"
+		 destdir="${classes.dir}"
+		 optimize="off"
+		 debug="${debug.flag}"
+		 verbose="${verbose.flag}"
+		 deprecation="on"        
+		 source="1.6"
+		 target="1.6">
+	    <classpath refid="compile.path"/>
+	  </javac>
+	</target>
+
+
+	<!-- ================================================-->
+	<!-- Compilation des sources  des tests        -->
+	<!-- ================================================-->
+
+	<target name="compile-test" depends="compile" description="Compilation des sources tests du projet">
+
+		<javac srcdir="${test.dir}"
+		 destdir="${test.classes.dir}"
+		 optimize="off"
+		 debug="${debug.flag}"
+		 verbose="${verbose.flag}"
+		 deprecation="on"        
+		 source="1.6"
+		 target="1.6">
+	    <classpath refid="test.compile.path"/>
+	  </javac>
+	 
+	</target>
+
+
+	<!-- =================================================================== -->
+	<!-- Exécution des test                           
+	-->
+	<!-- =================================================================== -->
+
+	<target name="run-test" depends="compile-test" description="Execution des tests" >
+
+	 <junit printsummary="yes" haltonfailure="no">
+		<classpath refid="test.run.path"/>
+	 	<formatter type="xml"/>
+	 	<formatter type="plain"/>
+
+		<batchtest fork="yes" todir="${reports.data.dir}">
+			<fileset dir="${test.classes.dir}">
+				<include name="**/*Test*.java"/>
+				<exclude name="**/AllTests.java"/>
+			</fileset>
+		</batchtest>
+	
+	</junit>
+	
+	</target>
+
+	<!-- =================================================================== -->
+	<!-- Reports des tests                       
+		Attention requiert que le formatter de junit soit en xml !!!  -->
+	<!-- =================================================================== -->
+
+	<target name="report-test" depends="run-test" description="Reports des tests ">
+		<junitreport todir="${reports.data.dir}">
+		  <fileset dir="${reports.data.dir}">
+		    <include name="TEST-*.xml"/>
+		  </fileset>
+		  <report format="frames" todir="${reports.html.dir}"/>
+		</junitreport>
+	</target>
+
+
+	<!-- ================================================-->
+	<!-- Génération de la documentation Javadoc          -->
+	<!-- ================================================-->
+	
+	<target name="javadoc" description="Génération de la documentation Javadoc">
+	  <javadoc sourcepath="${src.dir}"
+		   destdir="${javadoc.dir}"
+		packagenames="${package.name}"
+		author="true"
+		version="true"
+		use="true"
+		access="private"
+		linksource="true"
+		windowtitle="${ant.project.name} API">
+
+	    <classpath >
+	      <path refid="compile.path"/>
+	    </classpath>
+
+    <doctitle><![CDATA[<h1>${ant.project.name}</h1>]]></doctitle>
+    <bottom><![CDATA[<i>Copyright &#169; 2000 Dummy Corp. All Rights Reserved.</i>]]></bottom>
+    <tag name="todo" scope="all" description="To do:"/>
+    <group title="Group 1 Packages" packages="com.dummy.test.a*"/>
+    <group title="Group 2 Packages" packages="com.dummy.test.b*:com.dummy.test.c*"/>
+    <link offline="true" href="http://java.sun.com/j2se/1.5.0/docs/api/" packagelistLoc="C:\tmp"/>
+    <link href="http://developer.java.sun.com/developer/products/xml/docs/api/"/>
+
+	  </javadoc>
+	  
+	</target>
+
+
+
+	<target name="run-local" depends="compile" description="Execution de la Class Main" >
+
+	 <java classname="com.developpez.rpouiller.testjunit4.Operations">
+	 	<classpath path="${classes.dir}"/>
+	 </java>	
+
+	</target>
+	<!-- =================================================================== -->
+	<!-- Exécution des classes                           -->
+	<!-- =================================================================== -->
+
+	<target name="run" depends="compile" description="Execution de la Class Main" >
+
+	  <java classname="com.developpez.rpouiller.testjunit4.Operations" classpathref="run.path"></java>
+
+	</target>
+
+
+	<!-- =================================================================== -->
+	<!-- Génération de l'archive jar                          
+
+ -->
+	<!-- =================================================================== -->
+
+	<target name="jar" depends="compile,run-test,javadoc" description="Generate jar file">
+
+		<jar destfile="${jar.dir}/${ant.project.name}-${project.version}.jar" basedir="${classes.dir}">
+			<manifest>
+				<attribute name="Built-by" value="${user.name}"/>
+				<attribute name="Main-Class" value="com.developpez.rpouiller.testjunit4.Operations"/>
+				<section name="common/com.developpez.rpouiller.testjunit4.Operations">
+					<attribute name="Date-Creation" value="true"/>
+				</section>
+			</manifest>
+		</jar>			
+
+
+	</target>
+
+
+
+	<!-- =================================================================== -->
+	<!-- Produit une distribution des sources                       -->
+	<!-- =================================================================== -->
+
+	<target name="dist" depends="clean"  description="Produit une distribution des sources  du projet ">
+		<mkdir dir="${dist.dir}" />  
+		<mkdir dir="${tmp.dir}"/>
+		<copy todir="${tmp.dir}">
+			<!-- l exculde dist ne fonctionne pas ?-->
+  			<fileset dir="${basedir}" casesensitive="yes">
+	  			<include name="**/*"/>
+	  			<include name=".project"/>
+	  			<include name=".classpath"/>
+				<exclude name=".settings"/>
+				<exclude name="${dist.dir}"/>
+				<exclude name="${classes.dir}"/>
+				<exclude name="${test.dir}"/>
+				<exclude name="${test.classes.dir}"/>
+				<exclude name="${reports.dir}"/>
+				<exclude name="${tmp.dir}"/>
+				<patternset refid="ignore.files"/>
+  			</fileset>
+
+		</copy>
+
+		<tstamp/>
+
+		<zip zipfile="${dist.dir}/${project.shortname}-${DSTAMP}-${TSTAMP}-src.zip"
+		         basedir="${tmp.dir}"
+		         whenempty="create"/>
+
+		<delete dir="${tmp.dir}"/>
+
+	</target>
+
+	<!-- =================================================================== -->
+	<!-- Création de la tache addition                    -->
+	<!-- =================================================================== -->
+
+	<taskdef name="addition" classname="com.iutnantes.tOsmont.mesTaches.MaTacheAditionner"
+		classpath="${lib.dir}/MaTacheAditionner.jar"
+	/>
+	
+	<target name="Adition" description="Aditionne deux nombres">
+		<addition arg0="2" arg1="3"/>
+	</target>
+	
+</project>

@@ -1,0 +1,16 @@
+Manifest-Version: 1.0
+Ant-Version: Apache Ant 1.7.0
+Created-By: 1.6.0-b105 (Sun Microsystems Inc.)
+Built-By: hernandez
+
+Name: common
+Specification-Title: Example
+Specification-Version: 0.0.1
+Specification-Vendor: Example Organization
+Implementation-Title: common
+Implementation-Version: 0.0.1 November 22 2007
+Implementation-Vendor: Example Corp.
+
+Name: common/class1.class
+Sealed: false
+
